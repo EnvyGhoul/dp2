@@ -1,0 +1,425 @@
+# The script of the game goes in this file.
+
+
+# names of the characters.
+
+default relationships = [0, 3, 0, 0]
+
+# Relationship variables
+default dp_relationship = 0
+default a_relationship = 3
+default mp_relationship = 0
+default c_relationship = 0
+# Location Variable
+default street_lv = 0
+default alley_lv = 0
+# Unlocked locations
+screen cheat():
+    key "n" action Jump("end")
+# The screen that appears when clicking relationship
+screen relationship_button():
+    imagebutton:
+        idle "relationship.png"
+        hover "relationship.png"
+        xpos 1850 ypos 20
+        sensitive (1850, 20, 1900, 70)
+        focus_mask True
+        action ShowMenu("relationship_menu")
+# The screen that appears when clicking map
+screen map_button():
+    imagebutton:
+        idle "map.png"
+        hover "map.png"
+        xpos 1780 ypos 20
+        sensitive (1780, 20, 1830, 70)
+        focus_mask True
+        action ShowMenu("map_menu")
+
+# Defines the relationship menu
+screen relationship_menu():
+    modal True
+    frame:
+        xalign 0.5
+        yalign 0.5
+        text "Relationships:" ypos 30
+        text f"Assistant: {a_relationship}/3" ypos 60
+        text f"Mysterious Penguin: {mp_relationship}/3" ypos 100
+        text f"Choya: {c_relationship}/3" ypos 140
+        text "Press Esc To Close"
+
+# Defines the map menu
+screen map_menu():
+    modal True
+    frame:
+        xalign 0.5
+        yalign 0.5
+        text "Unlocked Locations:" ypos 30
+        textbutton "Back to Office" action [Jump("office")] ypos 60
+        textbutton "Street" action [Jump("street")] ypos 100
+        textbutton "Alley" action [Jump("alley")] ypos 140
+        text "Press Esc To Close"
+
+
+
+# Label for transitioning to the street
+label street:
+    scene street
+    show dp
+    "Back to the street."
+    hide sp
+    if street_lv == 0:
+        jump choya1
+    elif street_lv == 1:
+        jump choya2
+    elif street_lv == 2:
+        jump choya3
+    else:
+        jump choya4
+    return
+# Label for transitioning to the alley
+label alley:
+    scene alley
+    show dp
+    "Back to the alley."
+    hide dp
+    if alley_lv == 0:
+        jump alley1
+    elif alley_lv == 1:
+        jump alley2
+    elif alley_lv == 2:
+        jump alley3
+    else:
+        jump alley4
+    return
+
+# Game Start
+
+label start:
+    stop music
+    scene office
+    show dp
+
+    "Just another day in the shadows of Grimvale."
+
+    "As if the weight on my shoulders wasn't heavy enough, a new case falls into my lap."
+    hide dp
+    show a
+    a "Detective Penguin, we've got a report of someone who has mysteriously fallen asleep."
+    hide a
+    show dp
+    dp "Mysteriously fallen asleep, you say? The city is shrouded in mysteries as deep as my own thoughts."
+    hide dp
+    show a
+    a "The report mentions that the person can't be awakened, and no one knows why."
+    hide a
+    dp "Interesting. Let's head to the scene and unravel this mystery."
+
+    scene street
+    dp "Lead the way, Assistant."
+
+    
+
+    "Detective Penguin and his Assistant arrive at the location where the person has fallen asleep."
+
+    
+    scene black with dissolve
+    "As they investigate, they come across a penguin sleeping in a strange slumber."
+
+    
+    scene alley with dissolve
+    show mp
+    mp "Detective Penguin, you've stumbled upon something far more significant than you realize."
+
+    
+    dp "Who are you, and how are you connected to all of this?"
+
+    # Pause for player input
+    pause
+
+    # Choices
+    menu:
+        "Demand answers":
+            mp "I am the Mysterious Penguin. Their sleep is a consequence of a power I possess."
+            dp "Fine, but I need details. What force are you talking about?"
+            mp "Meet me at midnight in the abandoned observatory. I'll explain everything there."
+            # Increase relationship with Mysterious Penguin
+        "Express skepticism":
+            dp "This sounds like nonsense. How can sleep be a consequence of a 'powerful force'?"
+            mp "You'll see the truth when you meet me at midnight. The answers lie in the observatory."
+            # No change in relationship points
+    jump midnight_meeting
+
+
+# Label for midnight meeting scene
+label midnight_meeting:
+    scene bg_observatory_night with dissolve
+    "Detective Penguin arrives at the abandoned observatory, where the Mysterious Penguin awaits."
+
+    show mp
+    mp "You've come. Now, listen carefully. I possess the power to weave dreams and nightmares... A Dream Curse!"
+
+    
+    hide mp
+    show dp
+    dp "Dream curse? What do you mean?"
+    hide dp
+    show mp
+    mp "I can manipulate the dreams of others. My goal is to bring everyone in the world under the dream curse, where reality and dreams blend into one."
+    hide mp
+    # Pause for player input
+    pause
+
+    
+    dp "There's more to this than meets the eye. I need to keep my wits about me and dig deeper."
+    jump intro_done
+# label for after intro
+label intro_done:
+    show screen map_button
+    show screen relationship_button
+    show screen cheat
+    "You can now use the map and relationship button in the top right corner"
+    "Build relationships and discover more about the case in order to progress"
+    "Reaching Relationship 3 with every character will probably solve the case"
+# label for office location
+label office:
+    if street_lv == 3 and alley_lv == 3:
+        jump after1
+    show screen map_button
+    show screen relationship_button
+    show screen cheat
+    hide c
+    hide a
+    hide mp
+    hide dp
+    stop music
+    play music "office.mp3"
+    scene office
+    pause
+    jump office
+# label for after going to either alley or street
+label after:
+    stop music
+    play music "think.mp3"
+    scene office
+    "Thats enough investigating for now..."
+    "Your relationship level has increased"
+    jump office
+# label for after completing all investagations
+label after1:
+    stop music
+    play music "think.mp3"
+    scene office
+    "I've Finished Investigating everybody!"
+    "Click to continue to last scene"
+    pause
+    jump end
+# label for going to street for the first time
+label choya1:
+    stop music
+    play music "street.mp3"
+    hide dp
+    show c
+    c "My brother... he's been asleep for days. No one knows what's happening."
+    dp "Choya, was it? Detective Penguin, at your service. We're here to get to the bottom of this mystery."
+    c "You're a detective? Please, you have to help my brother. He's the only family I have."
+    dp "Don't worry, Choya. We'll do our best to figure out what's going on. Can you tell us anything about your brother's behavior before he fell asleep?"
+    c "He was acting strange for a while, talking about strange dreams and feeling a mysterious force. I didn't take him seriously until he just collapsed."
+    dp "Strange dreams and a mysterious force... This matches what the Mysterious Penguin mentioned about his Dream Curse."
+    c "You know about that? What's happening, Detective?"
+    dp "It seems there's a connection between your brother's condition and the Mysterious Penguin's Dream Curse. We're going to investigate this further. In the meantime, tell us everything you know."
+    c "I'll do anything to help my brother. Please, find a way to wake him up."
+    # Increase relationship with Choya
+    $c_relationship += 1
+    $street_lv += 1
+    python:
+        print(f"Choya Relationship: {c_relationship}")
+    hide c
+    show dp
+    dp "We'll do our best, Choya. You can count on us."
+    hide dp
+    stop music
+    jump after
+# label for going to street for the second time
+label choya2:
+    play music "street.mp3"
+    hide dp
+    show c
+    dp "Is there any more information you can provide me with Choya?"
+    c "Well, before my older brother fell asleep, a mysterious penguin fed him something"
+    dp "Hmmm interesting..."
+    dp "There is definitely more to this case then meets the eye"
+    dp "Anything else?"
+    c "Nope, nothing comes to mind"
+    c "I'll let you know if I remember more details"
+    c "Please save my brother soon!"
+    # Increase relationship with Choya
+    $c_relationship += 1
+    $street_lv += 1
+    python:
+        print(f"Choya Relationship: {c_relationship}")
+    hide c
+    stop music
+    jump after
+# label for going to street for the third time
+label choya3:
+    play music "street.mp3"
+    hide dp
+    show c
+    c "I remember everything now"
+    c "Mysterious Penguin gave my brother some sort of medicine"
+    c "And then he laughed saying he now had a dream curse"
+    c "After that my brother fell asleep"
+    dp "That seems more logical then just saying its magic"
+    dp "I think I'll need to finish my investigations with everyone else before I can come to a conclusion on this case"
+    # Increase relationship with Choya
+    $c_relationship += 1
+    $street_lv += 1
+    python:
+        print(f"Choya Relationship: {c_relationship}")
+    hide c
+    stop music
+    jump after
+# label for going to street after finishing street
+label choya4:
+    show screen map_button
+    show screen relationship_button
+    show screen cheat
+    hide dp
+    show c
+    pause
+    jump choya4
+# label for going to alley for the first time
+label alley1:
+    show mp
+    play music "alley.mp3"
+    mp "Hello Mr Detective"
+    dp "Hello"
+    mp "Why are you here"
+    dp "To uncover the truth"
+    mp "You're such a cornball"
+    dp "Says you, constantly blabbering on about magic"
+    mp "So you think being mean to you will make you tell the truth"
+    dp "..."
+    mp "Very well then, the truth is I learnt magic from a great mage"
+    "I guess I'll go along with this"
+    dp "What is your favourite spell you learnt?"
+    mp "Hmm... If I had to choose... THE DREAM CURSE!"
+    dp "Isn't that a curse not a spell?"
+    mp "HOW DARE YOU QUESTION ME!"
+    mp "BEGONE PEASANT"
+    "That's probably enough for now"
+    "I guess I'll come back later"
+    # Increase relationship with Mysterious Penguin
+    $mp_relationship += 1
+    $alley_lv += 1
+    python:
+        print(f"Mysterious Penguin Relationship: {mp_relationship}")
+    hide mp
+    stop music
+    jump after
+# label for going to alley for the second time
+label alley2:
+    play music "alley.mp3"
+    show mp
+    mp "YOU DARE COME BACK!"
+    dp "If it makes you any less mad I spent some time thinking about the dream curse"
+    dp "And I came to the conclusion that It really was just a spell"
+    mp "JUST A SPELL!"
+    mp "Well I guess thats fine then, as long as were on the same page"
+    "He seems to be very emotionaly unstable"
+    "One minute he's mad the next minute he's not"
+    "It's probably best to stay on his good side"
+    dp "So, what have you been up to?"
+    mp "Why are you trying to make small talk"
+    dp "Do you not want me to talk to you"
+    mp "You detectives... Trying to make it seem like its my fault."
+    dp "What are you talking about? What is your fault?"
+    mp "Just leave me alone"
+    dp "Okay"
+    "I'll leave for now, I don't want to make him mad again"
+    # Increase relationship with Mysterious Penguin
+    $mp_relationship += 1
+    $alley_lv += 1
+    python:
+        print(f"Mysterious Penguin Relationship: {mp_relationship}")
+    hide mp
+    stop music
+    jump after
+# label for going to alley for the third time
+label alley3:
+    play music "alley.mp3"
+    show mp
+    dp "I brought you something"
+    "You hand him a coffee"
+    scene black
+    hide mp
+    pause
+    scene alley
+    show mp
+    "I know you can't see him holding it, so just pretend he is lol"
+    mp "Thanks"
+    dp "No problem"
+    dp "Anyways isn't it always cold, out here in this alley?"
+    mp "Yeah, it took some time to get used to"
+    dp "You live here?"
+    mp "Yeah"
+    dp "I could find you a place to live if you'd like."
+    "In a prison"
+    mp "Really?"
+    dp "Yeah really"
+    mp "That would be great!"
+    "He's starting to warm up to me"
+    "I think next time I visit him he might admit to his crimes"
+    # Increase relationship with Mysterious Penguin
+    $mp_relationship += 1
+    $alley_lv += 1
+    python:
+        print(f"Mysterious Penguin Relationship: {mp_relationship}")
+    hide mp
+    stop music
+    jump after
+# label for going to alley after finishing alley
+label alley4:
+    show screen map_button
+    show screen relationship_button
+    show screen cheat
+    hide dp
+    show mp
+    pause
+    jump alley4
+# label for final scene of the game
+label end:
+    play music "revelation.mp3"
+    scene alley
+    show mp
+    mp "You probably already know the truth huh?"
+    dp "Was it a candy?"
+    mp "NO!"
+    mp "no, it was a sleeping curse"
+    dp "A candy that when consumed makes you fall asleep"
+    dp "Why would you do this?"
+    mp "IT'S A SLEEPING CURSE!"
+    dp "You're clearly delusional"
+    mp "HAH"
+    mp "A lowly human such as yourself dare to say such a thing"
+    mp "I'll put the sleeping curse on you!"
+    dp "But all I have to do is not eat the candy"
+    mp "The candy merely enhances the effect of my spell"
+    dp "Magic isn't real"
+    mp "Fine, you win"
+    mp "The sleeping curse is just a candy that makes you fall asleep"
+    hide mp
+    "The case has been solved, and Mysterious Penguin just admitted to his crimes"
+    scene office
+    "Shortly after Mysterious Penguin was arrested"
+    "It will remain a mystery why it took so long though"
+    "Thanks for playing the game!"
+    jump credits
+# label for credits
+label credits:
+    play music "credits.mp3"
+    scene black
+    centered "{size=+75}{cps=8}Written and Developed by:\n\nLexxin Finch{/cps}{/size}{p=5.0}{nw}"
+    centered "{size=+75}{cps=8}Please dont sue me for the music{/cps}{/size}{p=5.0}{nw}"
+    centered "{size=+75}{cps=8}Ok this is the last credit{/cps}{/size}{p=5.0}{nw}"
+    return
